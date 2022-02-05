@@ -6,6 +6,7 @@ import kotlinx.coroutines.yield
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import views.appstate.ConsumerPropertiesState
+import views.appstate.SelectedTopicState
 import java.time.Duration
 
 object ConsumerApi {
@@ -18,7 +19,7 @@ object ConsumerApi {
     fun readTopics(topics : List<String>) : Flow<ConsumerRecord<String, String>> {
         val consumer = consumer().apply { subscribe(topics) }
         return flow {
-            while (true) {
+            while (SelectedTopicState.keepListening()) {
                 consumer
                     .poll(Duration.ofMillis(50))
                     .forEach { record -> emit(record) }
